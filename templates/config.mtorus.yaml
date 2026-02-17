@@ -1,0 +1,51 @@
+##############################
+## FILE LOCATIONS AND NAMES ##
+##############################
+data_dir: '/path/to/your/analysis/' # e.g. /path/to/directory/SUNAGAWA/NAME24-1/
+sample_file: 'samples'
+blocklist: 'blocklist'
+REFERENCE_SEQUENCE_FILE:  # e.g. '/path/to/your/reference'. Can be left empty if you don't run defined community analysis
+
+
+#####################
+## USER PARAMETERS ##
+#####################
+FORWARD_PRIMER_NAME: '515f_parada'
+REVERSE_PRIMER_NAME: '806r_apprill'
+FORWARD_PRIMER_SEQUENCE: 'GTGYCAGCMGCCGCGGTAA' # can be left empty if you have a primers file that contains the correct primer names
+REVERSE_PRIMER_SEQUENCE: 'GGACTACNVGGGTWTCTAAT' # can be left empty if you have a primers file that contains the correct primer names
+QC_MINLEN: '111'
+QC_TRUNC_R1: '161'
+QC_TRUNC_R2: '121'
+QC_MAXEE: '2'
+LE_NBASES: '1e7' # The minimum number of total bases to use for error rate learning. Samples are read into memory until at least this number of total bases has been reached, or all provided samples have been read in.
+
+
+##################
+## STEPS TO RUN ##
+##################
+pairedEnd: True
+runCutadapt: True
+allowUntrimmed: False
+runQC: True
+runLearnErrors: True
+runInference: True
+runMergeReads: True
+runRemoveBimeras: True
+runReadStats: True # Run bbmap: change quality encoding (qin) and run stats to check quality
+runASVTax: True
+runOTUTax: True
+runUSEARCH: True # If using, please note that we are using a minimum sequence identity of 0.8 for a hit. This leads to false positives in lesser known environments.
+runDefCom: False
+
+
+#########################
+## END USER PARAMETERS ##
+#########################
+
+
+
+# Standard parameters for the Sunagawa lab.
+silva_training: '/cluster/work/grlab/projects/projects2024-mtorus/IMB_amplicon/resources/SILVA_SSU_r138_2019.RData'
+primers: '/cluster/work/grlab/projects/projects2024-mtorus/IMB_amplicon/resources/primers'
+USEARCH_DB: '/cluster/work/grlab/projects/projects2024-mtorus/IMB_amplicon/resources/SILVA_138_SSURef_NR99_tax_silva.fasta'

@@ -364,10 +364,10 @@ if pairedEnd:
         shell:
             '''
             command="
-            cutadapt -O 12 {params.allow_untrimmed} -g {params.fwd_primer} -G {params.rev_primer} -o {output.r1tmp} -p {output.r2tmp} {input.r1} {input.r2} -j {threads} --pair-adapters --minimum-length 75 &> {log.log}
-            cutadapt -O 12 --times 5 -g {params.fwd_primer} -o {output.r1tmp2} -j {threads} {output.r1tmp} &>> {log.log}
-            cutadapt -O 12 --times 5 -g {params.rev_primer} -o {output.r2tmp2} -j {threads} {output.r2tmp} &>> {log.log}
-            cutadapt -o {output.r1} -p {output.r2} {output.r1tmp2} {output.r2tmp2} -j {threads} --minimum-length {params.minlength} &>> {log.log} 
+            cutadapt -O 12 {params.allow_untrimmed} -g {params.fwd_primer} -G {params.rev_primer} -o {output.r1tmp} -p {output.r2tmp} {input.r1} {input.r2} -j {threads} --pair-adapters --minimum-length 75 > {log.log} 2>&1
+            cutadapt -O 12 --times 5 -g {params.fwd_primer} -o {output.r1tmp2} -j {threads} {output.r1tmp} >> {log.log} 2>&1
+            cutadapt -O 12 --times 5 -g {params.rev_primer} -o {output.r2tmp2} -j {threads} {output.r2tmp} >> {log.log} 2>&1
+            cutadapt -o {output.r1} -p {output.r2} {output.r1tmp2} {output.r2tmp2} -j {threads} --minimum-length {params.minlength} >> {log.log} 2>&1
             ";
             echo "$command" > {log.command};
             eval "$command"
@@ -407,7 +407,7 @@ if pairedEnd:
         shell:
             '''
             command="
-            Rscript {SCRIPTFOLDER}dada2_filterandtrim.R {input.fqgz1} {input.fqgz2} {output.fqgz1} {output.fqgz2} {params.maxee} {params.truncq} {params.maxn} {params.compress} {params.minlen} {params.trunc_R1} {params.trunc_R2} {threads} &> {log.log}
+            Rscript {SCRIPTFOLDER}dada2_filterandtrim.R {input.fqgz1} {input.fqgz2} {output.fqgz1} {output.fqgz2} {params.maxee} {params.truncq} {params.maxn} {params.compress} {params.minlen} {params.trunc_R1} {params.trunc_R2} {threads} > {log.log} 2>&1
             ";
             echo "$command" > {log.command};
             eval "$command"
@@ -457,7 +457,7 @@ if pairedEnd:
                 '/{sample}/{sample}.qc.stats.log'
         shell:
             '''
-            Rscript {SCRIPTFOLDER}qc_stats.R {input.r1_raw} {input.r2_raw} {input.r1_cut} {input.r2_cut} {input.r1_fil} {input.r2_fil} {output.pdf} &> {log.log}
+            Rscript {SCRIPTFOLDER}qc_stats.R {input.r1_raw} {input.r2_raw} {input.r1_cut} {input.r2_cut} {input.r1_fil} {input.r2_fil} {output.pdf} > {log.log} 2>&1
             '''
     rule read_stats:
         """
@@ -532,9 +532,9 @@ if not pairedEnd:
         shell:
             '''
             command="
-            cutadapt -O 12 {params.allow_untrimmed} -g {params.fwd_primer} -o {output.r1tmp} {input.r1} -j {threads} --minimum-length 75 &> {log.log}
-            cutadapt -O 12 --times 5 -g {params.fwd_primer} -o {output.r1tmp2} -j {threads} {output.r1tmp} &>> {log.log}
-            cutadapt -o {output.r1} {output.r1tmp2} -j {threads} --minimum-length {params.minlength} &>> {log.log} 
+            cutadapt -O 12 {params.allow_untrimmed} -g {params.fwd_primer} -o {output.r1tmp} {input.r1} -j {threads} --minimum-length 75 > {log.log} 2>&1
+            cutadapt -O 12 --times 5 -g {params.fwd_primer} -o {output.r1tmp2} -j {threads} {output.r1tmp} >> {log.log} 2>&1
+            cutadapt -o {output.r1} {output.r1tmp2} -j {threads} --minimum-length {params.minlength} >> {log.log} 2>&1
             ";
             echo "$command" > {log.command};
             eval "$command"
@@ -570,7 +570,7 @@ if not pairedEnd:
         shell:
             '''
             command="
-            Rscript {SCRIPTFOLDER}dada2_filterandtrim.R {input.fqgz1} {output.fqgz1} {params.maxee} {params.truncq} {params.maxn} {params.compress} {params.minlen} {params.trunc_R1} {threads} &> {log.log}
+            Rscript {SCRIPTFOLDER}dada2_filterandtrim.R {input.fqgz1} {output.fqgz1} {params.maxee} {params.truncq} {params.maxn} {params.compress} {params.minlen} {params.trunc_R1} {threads} > {log.log} 2>&1
             ";
             echo "$command" > {log.command};
             eval "$command"
@@ -615,7 +615,7 @@ if not pairedEnd:
                 '/{sample}/{sample}.qc.stats.log'
         shell:
             '''
-            Rscript {SCRIPTFOLDER}qc_stats.R {input.r1_raw} {input.r1_cut} {input.r1_fil} {output.pdf} &> {log.log}
+            Rscript {SCRIPTFOLDER}qc_stats.R {input.r1_raw} {input.r1_cut} {input.r1_fil} {output.pdf} > {log.log} 2>&1
             '''
 
     rule read_stats:
@@ -669,7 +669,7 @@ rule dada2_learnErrors:
     shell:
         '''
         command="
-        Rscript {SCRIPTFOLDER}dada2_learnErrors.R {input.samples} {output.rds} {threads} {params.nbases} {params.folder} &> {log.log}
+        Rscript {SCRIPTFOLDER}dada2_learnErrors.R {input.samples} {output.rds} {threads} {params.nbases} {params.folder} > {log.log} 2>&1
         ";
         echo "$command" > {log.command};
         eval "$command"
@@ -703,7 +703,7 @@ rule dada2_inference:
     shell:
         '''
         command="
-        Rscript {SCRIPTFOLDER}dada2_inference.R {input.samples} {input.errors} {output.tab} {output.dd} {threads} {params.ref} {params.folder} &> {log.log}
+        Rscript {SCRIPTFOLDER}dada2_inference.R {input.samples} {input.errors} {output.tab} {output.dd} {threads} {params.ref} {params.folder} > {log.log} 2>&1
         ";
         echo "$command" > {log.command};
         eval "$command"
@@ -737,7 +737,7 @@ rule dada2_mergeReads:
     shell:
         '''
         command="
-        Rscript {SCRIPTFOLDER}dada2_mergeReads.R {input.samples_r1} {input.samples_r2} {input.dd_r1} {input.dd_r2} {output.merged_seqtab} {output.merged_dd} fw &> {log.log}
+        Rscript {SCRIPTFOLDER}dada2_mergeReads.R {input.samples_r1} {input.samples_r2} {input.dd_r1} {input.dd_r2} {output.merged_seqtab} {output.merged_dd} fw > {log.log} 2>&1
         ";
         echo "$command" > {log.command};
         eval "$command"
@@ -766,7 +766,7 @@ rule bimera_removal:
     shell:
         '''
         command="
-        Rscript {SCRIPTFOLDER}remove_bimera.R {input.seqtab} {output.tab_nobim} {threads} &> {log.log}
+        Rscript {SCRIPTFOLDER}remove_bimera.R {input.seqtab} {output.tab_nobim} {threads} > {log.log} 2>&1
         ";
         echo "$command" > {log.command};
         eval "$command"
@@ -793,7 +793,7 @@ rule taxonomy:
     shell:
         '''
         command="
-        Rscript {SCRIPTFOLDER}idtaxa_seqtab.R -i {input.tab_nobim} -s {SILVA_TRAINING_FILE} -t {threads} -o {output.asv_table} &> {log.log}
+        Rscript {SCRIPTFOLDER}idtaxa_seqtab.R -i {input.tab_nobim} -s {SILVA_TRAINING_FILE} -t {threads} -o {output.asv_table} > {log.log} 2>&1
         ";
         echo "$command" > {log.command};
         eval "$command"
@@ -822,7 +822,7 @@ rule otu_asv:
     shell:
         '''
         command="
-        Rscript {SCRIPTFOLDER}asvtab2otutab.R  -i {input.asv_table} -f {output.asv_fasta} -a {output.asv_file} -o {output.otu_file} -u {output.uparse} -x {output.otu_fasta} &> {log.log}
+        Rscript {SCRIPTFOLDER}asvtab2otutab.R  -i {input.asv_table} -f {output.asv_fasta} -a {output.asv_file} -o {output.otu_file} -u {output.uparse} -x {output.otu_fasta} > {log.log} 2>&1
         ";
         echo "$command" > {log.command};
         eval "$command"
@@ -864,7 +864,7 @@ rule ref_assignment:
         32
     shell:
         '''
-        Rscript {SCRIPTFOLDER}assign_to_refs.R {input.asvtab} {input.asvs_fasta} {params.ref_fasta} 4 {output.asvs_ref} {params.threads} &> {log.log}
+        Rscript {SCRIPTFOLDER}assign_to_refs.R {input.asvtab} {input.asvs_fasta} {params.ref_fasta} 4 {output.asvs_ref} {params.threads} > {log.log} 2>&1
         '''
 
 rule uparse:

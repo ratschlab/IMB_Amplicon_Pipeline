@@ -178,7 +178,7 @@ raw_r2_file = temp_folder + 'raw_R2.fastq'
 
 # Process and subset read files for analysis.
 total_reads = 0
-print('Subsetting read files.')
+#print('Subsetting read files.')
 
 dest_r1_file = open(raw_r1_file, 'w')
 dest_r2_file = open(raw_r2_file, 'w')
@@ -217,8 +217,9 @@ for forward_primer, reverse_primer in primer_pairs:
 
     # Run cutadapt
     allowUntrimmed = "--discard-untrimmed" if not yaml_data['allowUntrimmed'] else ""
-    cutadapt_command_stub = f'cutadapt -O 12 {allowUntrimmed} -g {forward_primer[0]} -G {reverse_primer[0]} -o {cutadapt_r1_file} -p {cutadapt_r2_file} {raw_r1_file} {raw_r2_file} -j {threads} --pair-adapters --minimum-length 75 &> {cutadapt_log_file}'
-    subprocess.check_call(cutadapt_command_stub, shell=True)
+    cutadapt_command_stub = f'cutadapt -O 12 {allowUntrimmed} -g {forward_primer[0]} -G {reverse_primer[0]} -o {cutadapt_r1_file} -p {cutadapt_r2_file} {raw_r1_file} {raw_r2_file} -j {threads} --pair-adapters --minimum-length 75'
+    with open(cutadapt_log_file, "w") as fh:    
+        subprocess.check_call(cutadapt_command_stub, shell=True, stdout=fh, stderr=subprocess.DEVNULL)
 
     # Process cutadapt output
     pairs_written = count_filtered_pairs(cutadapt_log_file)
@@ -254,8 +255,9 @@ for forward_primer, reverse_primer in primer_pairs:
             r1_out_file = cutadapt_r1_file.replace('_R1.fastq', '_maxee-' + str(maxee) + '_R1.fastq')
             r2_out_file = cutadapt_r1_file.replace('_R1.fastq', '_maxee-' + str(maxee) + '_R2.fastq')
 
-            command = f'Rscript {SCRIPTFOLDER}dada2_filterandtrim.R {cutadapt_r1_file} {cutadapt_r2_file} {r1_out_file} {r2_out_file} {maxee} 2 0 FALSE {qcminlength} {r1_required_read_length} {r2_required_read_length} {threads} &> {r1_out_file}.log'
-            subprocess.check_call(command, shell=True)
+            command = f'Rscript {SCRIPTFOLDER}dada2_filterandtrim.R {cutadapt_r1_file} {cutadapt_r2_file} {r1_out_file} {r2_out_file} {maxee} 2 0 FALSE {qcminlength} {r1_required_read_length} {r2_required_read_length} {threads}'
+            with open(f'{r1_out_file}.log', 'w') as fh:
+                subprocess.check_call(command, shell=True, stdout=fh, stderr=subprocess.DEVNULL)
             pathlib.Path(r1_out_file).touch(exist_ok=True)
             pathlib.Path(r2_out_file).touch(exist_ok=True)
 
